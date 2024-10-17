@@ -1,84 +1,63 @@
 from dotenv import load_dotenv
 import os
 
- # import namespaces
 from azure.ai.translation.text import *
 from azure.ai.translation.text.models import InputTextItem
 
-
-## load configuration
+# Get Configuration Settings
 def load_configuration():
-    """
-    Loads environment variables for Azure translation service.
-    Returns:
-        translatorRegion (str): The configured Azure region.
-        translatorKey (str): The configured Azure translation key.
-    """
-    load_dotenv()
-    translatorRegion = os.getenv('TRANSLATOR_REGION')
-    translatorKey = os.getenv('TRANSLATOR_KEY')
-    if not translatorRegion or not translatorKey:
-        raise ValueError("Please provide a valid Azure region and key in the .env file.")
-    return translatorRegion, translatorKey
-
-## create traslation client
-def create_translation_client():
-    """
-    Creates a translation client using the Azure region and key.
-    Returns:
-        client (TextTranslationClient): The translation client.
-    """
-    translatorRegion, translatorKey = load_configuration()
-    credential = TranslatorCredential(translatorKey, translatorRegion)
-    client = TextTranslationClient(credential)
-    return client
-
-##get supported languages
-def get_supported_languages():
-    """
-    Gets the supported languages for translation.
-    Returns:
-        languagesResponse (GetLanguagesResult): The supported languages.
-    """
-    client = create_translation_client()
-    languagesResponse = client.get_languages(scope="translation")
-    return languagesResponse
-
-## select target language
-def select_target_language(supported_languages):
-    """
-    Prompts the user to choose a target language from the supported languages.
-    Args:
-        supported_languages (list): A list of supported languages (code, name tuples).
-    Returns:
-        str: The chosen target language code.
-    """
-    print("Supported languages:")
-    for code, name in supported_languages:
-        print(f"- {code} ({name})")
-    ## get target language
-    while True:
-        target_language = input("Enter a target language code (or 'q' to quit): ").lower()
-        if target_language == 'q':
-            exit()
-        ## check if target language is supported
-        if target_language in [code for code, _ in supported_languages]:
-            return target_language
-        else:
-            print(f"{target_language} is not a supported language.")
-
-
+     load_dotenv()
+     translatorRegion = os.getenv('TRANSLATOR_REGION')
+     translatorKey = os.getenv('TRANSLATOR_KEY')
+     return translatorRegion, translatorKey
+ 
+    
 def main():
     try:
-        # Get supported languages
-        languages = get_supported_languages()
-        print("Supported languages: ")
-        for language in languages:
-            print("\t", language)
-    except Exception as ex:
-        print(ex)
-        
+        # Load configuration settings
+        translatorRegion, translatorKey = load_configuration()
 
+        # Create client using endpoint and key
+        credential = TranslatorCredential(translatorKey, translatorRegion)
+        client = TextTranslationClient(credential)
+
+
+        ## Choose target language
+        languagesResponse = client.get_languages(scope="translation")
+        ## Print supported languages
+        print("{} languages supported.".format(len(languagesResponse.translation)))
+        print("(See https://learn.microsoft.com/azure/ai-services/translator/language-support#translation)")
+        print("Enter a target language code for translation (for example, 'en'):")
+        targetLanguage = "xx"
+        supportedLanguage = False
+        ## Check if language is supported
+        while supportedLanguage == False:
+            ## Get target language from user
+            targetLanguage = input()
+            ## Check if language is supported
+            if  targetLanguage in languagesResponse.translation.keys():
+                ## Set supportedLanguage to True to exit loop
+                supportedLanguage = True
+            else:
+                print("{} is not a supported language.".format(targetLanguage))
+
+        # Translate text
+        inputText = ""
+        ## Loop until user enters 'quit'
+        while inputText.lower() != "quit":
+            ## Get text to translate from user
+            inputText = input("Enter text to translate ('quit' to exit):")
+            if inputText != "quit":
+                ## Translate text
+                input_text_elements = [InputTextItem(text=inputText)]
+                translationResponse = client.translate(content=input_text_elements, to=[targetLanguage])
+                translation = translationResponse[0] if translationResponse else None
+                if translation:
+                    sourceLanguage = translation.detected_language
+                    for translated_text in translation.translations:
+                        print(f"'{inputText}' was translated from {sourceLanguage.language} to {translated_text.to} as '{translated_text.text}'.")
+    except Exception as ex:
+            print(ex)
 
 if __name__ == "__main__":
     main()
