@@ -39,7 +39,20 @@ def main():
                 print("{} is not a supported language.".format(targetLanguage))
 
         # Translate text
-
+        inputText = ""
+        ## Loop until user enters 'quit'
+        while inputText.lower() != "quit":
+            ## Get text to translate from user
+            inputText = input("Enter text to translate ('quit' to exit):")
+            if inputText != "quit":
+                ## Translate text
+                input_text_elements = [InputTextItem(text=inputText)]
+                translationResponse = client.translate(content=input_text_elements, to=[targetLanguage])
+                translation = translationResponse[0] if translationResponse else None
+                if translation:
+                    sourceLanguage = translation.detected_language
+                    for translated_text in translation.translations:
+                        print(f"'{inputText}' was translated from {sourceLanguage.language} to {translated_text.to} as '{translated_text.text}'.")
 
 
     except Exception as ex:
