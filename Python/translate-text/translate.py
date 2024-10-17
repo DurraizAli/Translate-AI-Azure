@@ -25,7 +25,20 @@ def show_supported_languages(languagesResponse):
         count += 1
         if count % 3 == 0:
             print()
-        
+
+## Get target language code for translation
+def get_target_language(languagesResponse):
+    print("Enter a target language code for translation (for example, 'en'):")
+    targetLanguage = "xx"
+    supportedLanguage = False
+    while supportedLanguage == False:
+        targetLanguage = input()
+        if  targetLanguage in languagesResponse.translation.keys():
+            supportedLanguage = True
+        else:
+            print("{} is not a supported language.".format(targetLanguage))
+    return targetLanguage 
+
 def main():
     try:
         # Load configuration settings
@@ -38,20 +51,9 @@ def main():
         
         ## Show supported languages
         show_supported_languages(languagesResponse)
-
-        print("Enter a target language code for translation (for example, 'en'):")
-        targetLanguage = "xx"
-        supportedLanguage = False
-        ## Check if language is supported
-        while supportedLanguage == False:
-            ## Get target language from user
-            targetLanguage = input()
-            ## Check if language is supported
-            if  targetLanguage in languagesResponse.translation.keys():
-                ## Set supportedLanguage to True to exit loop
-                supportedLanguage = True
-            else:
-                print("{} is not a supported language.".format(targetLanguage))
+        
+        ## Get target language code for translation
+        targetLanguage = get_target_language(languagesResponse)
 
         # Translate text
         inputText = ""
@@ -62,12 +64,12 @@ def main():
             if inputText != "quit":
                 ## Translate text
                 input_text_elements = [InputTextItem(text=inputText)]
-                translationResponse = client.translate(content=input_text_elements, to=[targetLanguage])
+                translationResponse = client.translate(content=input_text_elements, to=[targetLanguage], include_alignment=True)
                 translation = translationResponse[0] if translationResponse else None
                 if translation:
                     sourceLanguage = translation.detected_language
                     for translated_text in translation.translations:
-                        print(f"'{inputText}' was translated from {sourceLanguage.language} to {translated_text.to} as '{translated_text.text}'.")
+                        print(f"'{inputText}' was translated from {sourceLanguage.language} to {translated_text.to} as '{translated_text.text}' \nalignment: '{translated_text.alignment}'.")
     except Exception as ex:
             print(ex)
 
