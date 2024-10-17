@@ -61,15 +61,16 @@ def main():
         while inputText.lower() != "quit":
             ## Get text to translate from user
             inputText = input("Enter text to translate ('quit' to exit):")
+            profanityAction = "Marked"
             if inputText != "quit":
                 ## Translate text
                 input_text_elements = [InputTextItem(text=inputText)]
-                translationResponse = client.translate(content=input_text_elements, to=[targetLanguage], include_alignment=True)
+                translationResponse = client.translate(content=input_text_elements, to=[targetLanguage], include_alignment=True, include_sentence_length=True, profanity_action=profanityAction)
                 translation = translationResponse[0] if translationResponse else None
                 if translation:
                     sourceLanguage = translation.detected_language
                     for translated_text in translation.translations:
-                        print(f"'{inputText}' was translated from {sourceLanguage.language} to {translated_text.to} as '{translated_text.text}' \nalignment: '{translated_text.alignment}'.")
+                        print(f"'{inputText}' was translated from {sourceLanguage.language} to {translated_text.to} as '{translated_text.text}' \nAlignment: '{translated_text.alignment}' \nProfanity Action: {profanityAction}.")
     except Exception as ex:
             print(ex)
 
