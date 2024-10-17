@@ -15,7 +15,8 @@ def main():
         translatorKey = os.getenv('TRANSLATOR_KEY')
 
         # Create client using endpoint and key
-        
+        credential = TranslatorCredential(translatorKey, translatorRegion)
+        client = TextTranslationClient(credential)
 
 
         ## Choose target language
