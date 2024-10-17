@@ -21,6 +21,17 @@ def load_configuration():
         raise ValueError("Please provide a valid Azure region and key in the .env file.")
     return translatorRegion, translatorKey
 
+## create traslation client
+def create_translation_client():
+    """
+    Creates a translation client using the Azure region and key.
+    Returns:
+        client (TextTranslationClient): The translation client.
+    """
+    translatorRegion, translatorKey = load_configuration()
+    credential = TranslatorCredential(translatorKey, translatorRegion)
+    client = TextTranslationClient(credential)
+    return client
 
 def main():
     try:
