@@ -10,5 +10,5 @@ App in python to translate text using the Translator AI service from microsoft A
     Responsible AI Notice: Agree.
 
 2. Create the .env file and add the next parameters:
-    COG_SERVICE_KEY=your_cognitive_services_key
-    COG_SERVICE_REGION=your_cognitive_services_location
+    TRANSLATOR_KEY=your_translator_key
+    TRANSLATOR_REGION=your_translator_region
