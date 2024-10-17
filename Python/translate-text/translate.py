@@ -33,6 +33,18 @@ def create_translation_client():
     client = TextTranslationClient(credential)
     return client
 
+##get supported languages
+def get_supported_languages():
+    """
+    Gets the supported languages for translation.
+    Returns:
+        languagesResponse (GetLanguagesResult): The supported languages.
+    """
+    client = create_translation_client()
+    languagesResponse = client.get_languages(scope="translation")
+    return languagesResponse
+
+
 def main():
     try:
         # Get Configuration Settings
