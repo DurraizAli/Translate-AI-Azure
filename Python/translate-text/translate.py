@@ -10,23 +10,35 @@ def load_configuration():
      translatorRegion = os.getenv('TRANSLATOR_REGION')
      translatorKey = os.getenv('TRANSLATOR_KEY')
      return translatorRegion, translatorKey
- 
-    
+
+## Create client
+def create_client(translatorRegion, translatorKey):
+    credential = TranslatorCredential(translatorKey, translatorRegion)
+    client = TextTranslationClient(credential)
+    return client
+
+## show supported languages
+def show_supported_languages(languagesResponse):
+    count = 0
+    for language_code, language_data in languagesResponse.translation.items():
+        print(f"[{language_code}: {language_data['name']}]", end=" ")
+        count += 1
+        if count % 3 == 0:
+            print()
+        
 def main():
     try:
         # Load configuration settings
         translatorRegion, translatorKey = load_configuration()
-
         # Create client using endpoint and key
-        credential = TranslatorCredential(translatorKey, translatorRegion)
-        client = TextTranslationClient(credential)
-
-
+        client = create_client(translatorRegion, translatorKey)
+        
         ## Choose target language
         languagesResponse = client.get_languages(scope="translation")
-        ## Print supported languages
-        print("{} languages supported.".format(len(languagesResponse.translation)))
-        print("(See https://learn.microsoft.com/azure/ai-services/translator/language-support#translation)")
+        
+        ## Show supported languages
+        show_supported_languages(languagesResponse)
+
         print("Enter a target language code for translation (for example, 'en'):")
         targetLanguage = "xx"
         supportedLanguage = False
