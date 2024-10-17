@@ -20,8 +20,23 @@ def main():
 
 
         ## Choose target language
-
-
+        languagesResponse = client.get_languages(scope="translation")
+        ## Print supported languages
+        print("{} languages supported.".format(len(languagesResponse.translation)))
+        print("(See https://learn.microsoft.com/azure/ai-services/translator/language-support#translation)")
+        print("Enter a target language code for translation (for example, 'en'):")
+        targetLanguage = "xx"
+        supportedLanguage = False
+        ## Check if language is supported
+        while supportedLanguage == False:
+            ## Get target language from user
+            targetLanguage = input()
+            ## Check if language is supported
+            if  targetLanguage in languagesResponse.translation.keys():
+                ## Set supportedLanguage to True to exit loop
+                supportedLanguage = True
+            else:
+                print("{} is not a supported language.".format(targetLanguage))
 
         # Translate text
 
