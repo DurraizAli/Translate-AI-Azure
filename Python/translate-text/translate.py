@@ -6,6 +6,21 @@ from azure.ai.translation.text import *
 from azure.ai.translation.text.models import InputTextItem
 
 
+## load configuration
+def load_configuration():
+    """
+    Loads environment variables for Azure translation service.
+    Returns:
+        translatorRegion (str): The configured Azure region.
+        translatorKey (str): The configured Azure translation key.
+    """
+    load_dotenv()
+    translatorRegion = os.getenv('TRANSLATOR_REGION')
+    translatorKey = os.getenv('TRANSLATOR_KEY')
+    if not translatorRegion or not translatorKey:
+        raise ValueError("Please provide a valid Azure region and key in the .env file.")
+    return translatorRegion, translatorKey
+
 
 def main():
     try:
@@ -57,6 +72,7 @@ def main():
 
     except Exception as ex:
         print(ex)
+        
 
 
 if __name__ == "__main__":
